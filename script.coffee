@@ -2356,6 +2356,7 @@ QuoteInline =
     @classList.toggle 'inlined'
 
   add: (q, id) ->
+    # XXX
     # Can't use this because Firefox a shit:
     # root = $.x 'ancestor::*[parent::blockquote]', q
     unless isBacklink = /\bbacklink\b/.test q.className
@@ -2381,6 +2382,7 @@ QuoteInline =
           Unread.replies.splice i, 1
           Unread.update true
           break
+      Main.node [clonePost]
       return
 
     inline = $.el 'div',
@@ -2424,6 +2426,7 @@ QuoteInline =
     link.nextSibling.href = "#{pathname}#q#{id}"
     $.addClass newInline, 'crosspost'
     $.replace inline, newInline
+    Main.node [newInline]
 
   clone: (id, el) ->
     clone = $.el 'div',

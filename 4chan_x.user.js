@@ -3134,6 +3134,7 @@
             break;
           }
         }
+        Main.node([clonePost]);
         return;
       }
       inline = $.el('div', {
@@ -3195,7 +3196,8 @@
       link.href = "" + pathname + "#p" + id;
       link.nextSibling.href = "" + pathname + "#q" + id;
       $.addClass(newInline, 'crosspost');
-      return $.replace(inline, newInline);
+      $.replace(inline, newInline);
+      return Main.node([newInline]);
     },
     clone: function(id, el) {
       var clone, node, post, _i, _len, _ref;
