@@ -2596,6 +2596,7 @@ Quotify =
 QuoteThreading =
   init: ->
     Main.callbacks.push @node
+    @dialog()
   node: (post) ->
     #hash table + linked list
     #array implementation is very awkward - mid-array inserts, loop to find
@@ -2615,7 +2616,7 @@ QuoteThreading =
         uniq[qid] = true
 
     keys = Object.keys uniq
-    return unless keys.length is 1 #multiple posts quoted, bail
+    return unless keys.length is 1 # bail on 0, multiple quotes
 
     qid = keys[0]
     qreply = replies[qid]
@@ -2639,6 +2640,24 @@ QuoteThreading =
     reply.next = next
 
     Unread.replies = replies
+  dialog: ->
+    controls = $.el 'label',
+      id: 'thread'
+      class: 'controls'
+      innerHTML:
+        "Thread<input type=checkbox checked>"
+    input = $ 'input', controls
+    $.on input, 'click', QuoteThreading.toggle
+
+    $.prepend $.id('delform'), controls
+  toggle: ->
+    thread = $ '.thread'
+    replies = $$ '.replyContainer', thread
+    replies.sort (a, b) ->
+      aID = Number a.id[2..]
+      bID = Number b.id[2..]
+      aID - bID
+    $.add thread, replies
 
 ReportButton =
   init: ->

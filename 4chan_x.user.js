@@ -3424,7 +3424,8 @@
 
   QuoteThreading = {
     init: function() {
-      return Main.callbacks.push(this.node);
+      Main.callbacks.push(this.node);
+      return this.dialog();
     },
     node: function(post) {
       var id, keys, next, pEl, pid, preply, prev, qid, qreply, quote, quotes, replies, reply, uniq, _i, _len;
@@ -3466,6 +3467,29 @@
       preply.next = reply;
       reply.next = next;
       return Unread.replies = replies;
+    },
+    dialog: function() {
+      var controls, input;
+      controls = $.el('label', {
+        id: 'thread',
+        "class": 'controls',
+        innerHTML: "Thread<input type=checkbox checked>"
+      });
+      input = $('input', controls);
+      $.on(input, 'click', QuoteThreading.toggle);
+      return $.prepend($.id('delform'), controls);
+    },
+    toggle: function() {
+      var replies, thread;
+      thread = $('.thread');
+      replies = $$('.replyContainer', thread);
+      replies.sort(function(a, b) {
+        var aID, bID;
+        aID = Number(a.id.slice(2));
+        bID = Number(b.id.slice(2));
+        return aID - bID;
+      });
+      return $.add(thread, replies);
     }
   };
 
