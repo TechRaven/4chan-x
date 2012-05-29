@@ -662,6 +662,7 @@ ExpandThread =
     for backlink in $$ '.backlink', a.previousElementSibling
       $.rm backlink unless $.id backlink.hash[1..]
     $.after a, nodes
+    Main.node nodes
 
 ThreadHiding =
   init: ->
