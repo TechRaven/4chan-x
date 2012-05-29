@@ -2622,7 +2622,13 @@ QuoteThreading =
     qreply = replies[qid]
     reply = replies[id]
 
-    $.add qreply.el.parentNode, reply.el.parentNode
+    qroot = qreply.el.parentNode
+    threadContainer = qroot.nextSibling
+    if threadContainer?.className isnt 'threadContainer'
+      threadContainer = $.el 'div', className: 'threadContainer'
+      $.after qroot, threadContainer
+
+    $.add threadContainer, reply.el.parentNode
     pEl = $.x 'preceding::div[contains(@class,"post reply")][1]/parent::div', reply.el.parentNode
     pid = pEl.id[2..]
     preply = replies[pid]
@@ -2653,11 +2659,18 @@ QuoteThreading =
   toggle: ->
     thread = $ '.thread'
     replies = $$ '.replyContainer', thread
-    replies.sort (a, b) ->
-      aID = Number a.id[2..]
-      bID = Number b.id[2..]
-      aID - bID
-    $.add thread, replies
+    if @checked
+      nodes = (Main.preParse reply for reply in replies)
+      Unread.node         node for node in nodes
+      QuoteThreading.node node for node in nodes
+    else
+      replies.sort (a, b) ->
+        aID = Number a.id[2..]
+        bID = Number b.id[2..]
+        aID - bID
+      $.add thread, replies
+      containers = $$ '.threadContainer', thread
+      $.rm container for container in containers
 
 ReportButton =
   init: ->
@@ -3690,7 +3703,7 @@ div.opContainer {
   border-bottom: 1px dashed;
 }
 
-.replyContainer > .replyContainer {
+.threadContainer {
   margin-left: 20px;
   border-left: 1px solid black;
 }
