@@ -1995,6 +1995,7 @@ Updater =
       if lastPost = nodes[0]
         Updater.lastPost = lastPost
       $.add Updater.thread, nodes.reverse()
+      Main.node nodes
       if scroll
         nodes[0].scrollIntoView()
 
@@ -2358,7 +2359,7 @@ QuoteInline =
     # Can't use this because Firefox a shit:
     # root = $.x 'ancestor::*[parent::blockquote]', q
     unless isBacklink = /\bbacklink\b/.test q.className
-      root   = q
+      root = q
       while root.parentNode.nodeName isnt 'BLOCKQUOTE'
         root = root.parentNode
     if el = $.id "p#{id}"
@@ -3191,19 +3192,9 @@ Main =
         Nav.init()
 
     board = $ '.board'
-    nodes = []
-    for node in $$ '.postContainer', board
-      nodes.push Main.preParse node
+    nodes = $$ '.postContainer', board
     Main.node nodes, true
     Main.prettify = Main._prettify
-
-    if MutationObserver = window.WebKitMutationObserver or window.MozMutationObserver or window.OMutationObserver or window.MutationObserver
-      observer = new MutationObserver Main.observer
-      observer.observe board,
-        childList: true
-        subtree:   true
-    else
-      $.on board, 'DOMNodeInserted', Main.listener
 
   pruneHidden: ->
     now = Date.now()
@@ -3274,21 +3265,10 @@ Main =
   node: (nodes, notify) ->
     for callback in Main.callbacks
       try
-        callback node for node in nodes
+        callback Main.preParse node for node in nodes
       catch err
         alert "4chan X has experienced an error. To help fix this, please send the following snippet to:\nhttp://aeosynth.github.com/4chan-x/#bug-report\n\n#{err.message}\n#{err.stack}" if notify
     return
-  observer: (mutations) ->
-    nodes = []
-    for mutation in mutations
-      for addedNode in mutation.addedNodes
-        if (/\bpostContainer\b/.test addedNode.className) and not (/\bpostContainer\b/.test addedNode.parentNode.className)
-          nodes.push Main.preParse addedNode
-    Main.node nodes if nodes.length
-  listener: (e) ->
-    {target} = e
-    if (/\bpostContainer\b/.test target.className) and not (/\bpostContainer\b/.test target.parentNode.className)
-      Main.node [Main.preParse target]
 
   prettify: -> return
   _prettify: (bq) ->

@@ -2551,6 +2551,7 @@
           Updater.lastPost = lastPost;
         }
         $.add(Updater.thread, nodes.reverse());
+        Main.node(nodes);
         if (scroll) {
           return nodes[0].scrollIntoView();
         }
@@ -4095,7 +4096,7 @@
       return $.ready(Main.ready);
     },
     ready: function() {
-      var MutationObserver, a, board, nav, node, nodes, now, observer, _i, _j, _len, _len1, _ref, _ref1;
+      var a, board, nav, nodes, now, _i, _len, _ref;
       if (d.title === '4chan - 404') {
         Redirect.init();
         return;
@@ -4173,23 +4174,9 @@
         }
       }
       board = $('.board');
-      nodes = [];
-      _ref1 = $$('.postContainer', board);
-      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-        node = _ref1[_j];
-        nodes.push(Main.preParse(node));
-      }
+      nodes = $$('.postContainer', board);
       Main.node(nodes, true);
-      Main.prettify = Main._prettify;
-      if (MutationObserver = window.WebKitMutationObserver || window.MozMutationObserver || window.OMutationObserver || window.MutationObserver) {
-        observer = new MutationObserver(Main.observer);
-        return observer.observe(board, {
-          childList: true,
-          subtree: true
-        });
-      } else {
-        return $.on(board, 'DOMNodeInserted', Main.listener);
-      }
+      return Main.prettify = Main._prettify;
     },
     pruneHidden: function() {
       var cutoff, hiddenThreads, id, now, timestamp, _ref;
@@ -4281,37 +4268,13 @@
         try {
           for (_j = 0, _len1 = nodes.length; _j < _len1; _j++) {
             node = nodes[_j];
-            callback(node);
+            callback(Main.preParse(node));
           }
         } catch (err) {
           if (notify) {
             alert("4chan X has experienced an error. To help fix this, please send the following snippet to:\nhttp://aeosynth.github.com/4chan-x/#bug-report\n\n" + err.message + "\n" + err.stack);
           }
         }
-      }
-    },
-    observer: function(mutations) {
-      var addedNode, mutation, nodes, _i, _j, _len, _len1, _ref;
-      nodes = [];
-      for (_i = 0, _len = mutations.length; _i < _len; _i++) {
-        mutation = mutations[_i];
-        _ref = mutation.addedNodes;
-        for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-          addedNode = _ref[_j];
-          if ((/\bpostContainer\b/.test(addedNode.className)) && !(/\bpostContainer\b/.test(addedNode.parentNode.className))) {
-            nodes.push(Main.preParse(addedNode));
-          }
-        }
-      }
-      if (nodes.length) {
-        return Main.node(nodes);
-      }
-    },
-    listener: function(e) {
-      var target;
-      target = e.target;
-      if ((/\bpostContainer\b/.test(target.className)) && !(/\bpostContainer\b/.test(target.parentNode.className))) {
-        return Main.node([Main.preParse(target)]);
       }
     },
     prettify: function() {},
